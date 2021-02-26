@@ -2,6 +2,8 @@ package cryptoutil
 
 import (
 	"crypto"
+	"crypto/ecdsa"
+	"crypto/elliptic"
 	"crypto/rsa"
 	"crypto/sha256"
 	"encoding/asn1"
@@ -20,8 +22,10 @@ func GenerateSubjectKeyID(pub crypto.PublicKey) ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
+	case *ecdsa.PublicKey:
+		pubBytes = elliptic.Marshal(pub.Curve, pub.X, pub.Y)
 	default:
-		return nil, errors.New("only RSA public key is supported")
+		return nil, errors.New("only ECDSA and RSA public keys are supported")
 	}
 
 	hash := sha256.Sum256(pubBytes)
